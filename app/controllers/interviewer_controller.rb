@@ -17,6 +17,10 @@ class InterviewerController < ApplicationController
     skills = Interviewer.get_skills(params[:name])
     render json:{success:true,skills:skills}
   end
+  def match_interviewers
+    interviewers = Interviewer.match_interviewers(params)
+    render json:{success:true,interviewers:interviewers,message:["Interviewers list"]}
+  end
 
   private
 
