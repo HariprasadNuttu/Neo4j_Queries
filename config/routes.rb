@@ -1,10 +1,9 @@
 Rails.application.routes.draw do
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
-  post '/interviewer/freelancer_domains' , to:'interviewer#freelancer_domains'
-  get '/interviewer/get_title' , to:'interviewer#get_title'
-  get '/interviewer/get_skills' , to:'interviewer#get_skills'
 
+  match "/create_interviewer" => "interviewer#create", via: :post
+  match "/get_titles" => "interviewer#get_title", via: :get
+  match "/get_skills" => "interviewer#get_skills", via: :get
   match "/match_interviewers" => "interviewer#match_interviewers", via: :get
-  # match 'freelancer_domains', to: 'interviewer#freelancer_domains', via: post
 
 end

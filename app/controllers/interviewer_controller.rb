@@ -1,5 +1,5 @@
 class InterviewerController < ApplicationController
-  def freelancer_domains
+  def create
     # raise params.inspect
     interviewer = Interviewer.new name:params[:name],email:params[:email],title:params[:title],skills:params[:skill_set],languages_set:params[:languages_set],skill_set:params[:skills],languages:params[:languages],expertise:params[:expertise],domain:params[:domain]
     # raise interviewer.inspect
@@ -20,6 +20,9 @@ class InterviewerController < ApplicationController
   def match_interviewers
     interviewers = Interviewer.match_interviewers(params)
     render json:{success:true,interviewers:interviewers,message:["Interviewers list"]}
+  end
+  def domain_based_interviewers
+
   end
 
   private
