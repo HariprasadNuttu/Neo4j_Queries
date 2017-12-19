@@ -1,8 +1,11 @@
 require 'rest-client'
+require 'yaml'
+$neo4j_urls = YAML.load_file('config/neo4j.yml')
+$neo4j_urls = $neo4j_urls[Rails.env]
 class Interviewer < ApplicationRecord
   after_create :create_interviewer
   after_update :update_interviewer
-
+  after_destroy :destroy_interviewer
   def self.create_interviewer()
     # data = RestClient.get 'http://172.16.19.169:8500'
     # return "Hello world"
@@ -23,7 +26,7 @@ class Interviewer < ApplicationRecord
 
     dup =  {"name":"Hariprasad nUttu", "email":"hariprasadnuttu@gmail.com"}
 
-    response = RestClient.post "http://172.16.19.200:8500/db/data/cypher", {"query":"CREATE (n:Person { name }) RETURN n","params":{"name":dup}}.to_json, :content_type =>"application/json";
+    response = RestClient.post "#{$neo4j_urls['url']}/db/data/cypher", {"query":"CREATE (n:Person { name }) RETURN n","params":{"name":dup}}.to_json, :content_type =>"application/json";
 
 
   end
@@ -36,7 +39,7 @@ class Interviewer < ApplicationRecord
     puts " #{self.to_json}"
     interviewer_data = interviewer_profile
 
-    interviewer = RestClient.post "http://172.16.19.239:8500/db/data/cypher", {"query":"CREATE (interviewer:Freelancer { name }) RETURN interviewer","params":{"name":interviewer_data}}.to_json, :content_type =>"application/json";
+    interviewer = RestClient.post "#{$neo4j_urls['url']}/db/data/cypher", {"query":"CREATE (interviewer:Freelancer { name }) RETURN interviewer","params":{"name":interviewer_data}}.to_json, :content_type =>"application/json";
 
     puts "#{interviewer}"
     puts "================== Create Node End================"
@@ -89,27 +92,42 @@ class Interviewer < ApplicationRecord
 
   def mapping_relationxship
     puts "==============Has Experince Start ============"
-    has_experience = RestClient.post "http://172.16.19.239:8500/db/data/cypher", {"query":"match (interviewer:Freelancer{interviewer_id:{id}}),(skill:Skill) where skill.name IN interviewer.skill_set foreach (skill_name IN interviewer.skills | foreach (k in (case when split(skill_name,'-')[0]=skill.name  then [1] else [] end) | merge (interviewer)-[:Has_experience {level:split(skill_name,'-')[1]}]->(skill))) return interviewer,skill" ,"params":{"id":self.id.to_i}}.to_json, :content_type =>"application/json";
+    has_experience = RestClient.post "#{$neo4j_urls['url']}/db/data/cypher", {"query":"match (interviewer:Freelancer{interviewer_id:{id}}),(skill:Skill) where skill.name IN interviewer.skill_set foreach (skill_name IN interviewer.skills | foreach (k in (case when split(skill_name,'-')[0]=skill.name  then [1] else [] end) | merge (interviewer)-[:Has_experience {level:split(skill_name,'-')[1]}]->(skill))) return interviewer,skill" ,"params":{"id":self.id.to_i}}.to_json, :content_type =>"application/json";
 
     puts "#{has_experience}"
     puts "==============Has Experince  End============"
 
     puts "=============Understands Start======="
-    understands = RestClient.post "http://172.16.19.239:8500/db/data/cypher", {"query":"match (interviewer:Freelancer{interviewer_id:{id}}),(language:Languages) where language.name IN interviewer.languages_set foreach (language_name IN interviewer.languages | foreach (k in (case when split(language_name,'-')[0]=language.name  then [1] else [] end) | merge (interviewer)-[:Understands {Proficiency:split(language_name,'-')[1]}]->(language))) return interviewer,language","params":{"id":self.id.to_i}}.to_json, :content_type =>"application/json";
+    understands = RestClient.post "#{$neo4j_urls['url']}/db/data/cypher", {"query":"match (interviewer:Freelancer{interviewer_id:{id}}),(language:Languages) where language.name IN interviewer.languages_set foreach (language_name IN interviewer.languages | foreach (k in (case when split(language_name,'-')[0]=language.name  then [1] else [] end) | merge (interviewer)-[:Understands {Proficiency:split(language_name,'-')[1]}]->(language))) return interviewer,language","params":{"id":self.id.to_i}}.to_json, :content_type =>"application/json";
     puts "#{understands}"
     puts "=============Understands End=========="
 
     puts "=============Has Knowledge Start======="
-    has_knowledge = RestClient.post "http://172.16.19.239:8500/db/data/cypher", {"query":"match (interviewer:Freelancer {interviewer_id:{id}}),(domain:Domains) where domain.name IN interviewer.domain foreach (object IN interviewer.domain |
+    has_knowledge = RestClient.post "#{$neo4j_urls['url']}/db/data/cypher", {"query":"match (interviewer:Freelancer {interviewer_id:{id}}),(domain:Domains) where domain.name IN interviewer.domain foreach (object IN interviewer.domain |
 	foreach (k in (case when split(object,'-')[0]=domain.name  then [1] else [] end) | merge (interviewer)-[:Has_Knowledge]->(domain))) return interviewer,domain","params":{"id":self.id.to_i}}.to_json, :content_type =>"application/json";
     puts "#{has_knowledge}"
     puts "=============Has Knowledge End=========="
 
     puts "=============Worked As  Start======="
-    worked_as = RestClient.post "http://172.16.19.239:8500/db/data/cypher", {"query":"match (interviewer:Freelancer {interviewer_id:{id}}),(title:Title) where title.name = interviewer.title merge (interviewer)-[:Worked_As]->(title) return interviewer,title","params":{"id":self.id.to_i}}.to_json, :content_type =>"application/json";
+    worked_as = RestClient.post "#{$neo4j_urls['url']}/db/data/cypher", {"query":"match (interviewer:Freelancer {interviewer_id:{id}}),(title:Title) where title.name = interviewer.title merge (interviewer)-[:Worked_As]->(title) return interviewer,title","params":{"id":self.id.to_i}}.to_json, :content_type =>"application/json";
     puts "#{worked_as}"
     puts "=============Worked As End=========="
 
+  end
+  def destroy_interviewer
+    destory_interviewer = RestClient.post "#{$neo4j_urls['url']}/db/data/cypher", {"query":"match (interviewer:Freelancer {interviewer_id:{id}}) detach delete interviewer","params":{"id":self.id.to_i}}.to_json,:content_type =>"application/json";
+    puts "#{destory_interviewer}"
+  end
+  def self.get_titles(title)
+    titles = RestClient.post "#{$neo4j_urls['url']}/db/data/cypher", {"query":"match (title:Title) where toLower(title.name) =~{name} return title.name;","params":{"name":"(?i).*"+title.downcase+".*"}}.to_json,:content_type =>"application/json";
+
+    JSON.parse(titles.body)["data"]
+  end
+
+  def self.get_skills(name)
+    titles = RestClient.post "#{$neo4j_urls['url']}/db/data/cypher", {"query":"match (skill:Skill) where toLower(skill.name) =~{name} return skill.name;","params":{"name":"(?i).*"+name.downcase+".*"}}.to_json,:content_type =>"application/json";
+
+    JSON.parse(titles.body)["data"]
   end
 
 end

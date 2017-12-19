@@ -9,6 +9,14 @@ class InterviewerController < ApplicationController
     else
     end
   end
+  def get_title
+    titles = Interviewer.get_titles(params[:name])
+    render json:{success:true,titles:titles}
+  end
+  def get_skills
+    skills = Interviewer.get_skills(params[:name])
+    render json:{success:true,skills:skills}
+  end
 
   private
 

@@ -4802,3 +4802,88 @@ org.neo4j.bolt.v1.packstream.PackOutputClosedException: Network channel towards 
 	foreach (k in (case when split(object,'-')[0]=domain.name  then [1] else [] end) | merge (interviewer)-[:Has_Knowledge]->(domain))) return interviewer,domain
 2017-12-18 10:13:33.708+0000 INFO [o.n.c.i.CommunityCompatibilityFactory] Discarded stale query from the query cache after 1521 seconds: match (interviewer:Freelancer {interviewer_id:{id}}),(domain:Domains) where domain.name IN interviewer.domain foreach (object IN interviewer.domain |
 	foreach (k in (case when split(object,'-')[0]=domain.name  then [1] else [] end) | merge (interviewer)-[:Has_Knowledge]->(domain))) return interviewer,domain
+2017-12-18 10:25:08.421+0000 INFO [o.n.k.i.t.l.c.CheckPointerImpl] Check Pointing triggered by scheduler for time threshold [121]:  Starting check pointing...
+2017-12-18 10:25:08.421+0000 INFO [o.n.k.i.t.l.c.CheckPointerImpl] Check Pointing triggered by scheduler for time threshold [121]:  Starting store flush...
+2017-12-18 10:25:08.927+0000 INFO [o.n.k.i.s.c.CountsTracker] About to rotate counts store at transaction 121 to [/home/hariprasad/work/neo4j/db/neo4j/development/data/databases/graph.db/neostore.counts.db.a], from [/home/hariprasad/work/neo4j/db/neo4j/development/data/databases/graph.db/neostore.counts.db.b].
+2017-12-18 10:25:08.927+0000 INFO [o.n.k.i.s.c.CountsTracker] Successfully rotated counts store at transaction 121 to [/home/hariprasad/work/neo4j/db/neo4j/development/data/databases/graph.db/neostore.counts.db.a], from [/home/hariprasad/work/neo4j/db/neo4j/development/data/databases/graph.db/neostore.counts.db.b].
+2017-12-18 10:25:09.079+0000 INFO [o.n.k.i.t.l.c.CheckPointerImpl] Check Pointing triggered by scheduler for time threshold [121]:  Store flush completed
+2017-12-18 10:25:09.079+0000 INFO [o.n.k.i.t.l.c.CheckPointerImpl] Check Pointing triggered by scheduler for time threshold [121]:  Starting appending check point entry into the tx log...
+2017-12-18 10:25:09.104+0000 INFO [o.n.k.i.t.l.c.CheckPointerImpl] Check Pointing triggered by scheduler for time threshold [121]:  Appending check point entry into the tx log completed
+2017-12-18 10:25:09.104+0000 INFO [o.n.k.i.t.l.c.CheckPointerImpl] Check Pointing triggered by scheduler for time threshold [121]:  Check pointing completed
+2017-12-18 10:25:09.104+0000 INFO [o.n.k.i.t.l.p.LogPruningImpl] Log Rotation [0]:  Starting log pruning.
+2017-12-18 10:25:09.104+0000 INFO [o.n.k.i.t.l.p.LogPruningImpl] Log Rotation [0]:  Log pruning complete.
+2017-12-18 11:12:41.162+0000 ERROR [o.n.b.v.t.BoltMessagingProtocolV1Handler] Failed to write response to driver Network channel towards /172.16.19.239:54652 is closed. Client has probably been stopped.
+org.neo4j.bolt.v1.packstream.PackOutputClosedException: Network channel towards /172.16.19.239:54652 is closed. Client has probably been stopped.
+	at org.neo4j.bolt.v1.transport.ChunkedOutput.ensure(ChunkedOutput.java:166)
+	at org.neo4j.bolt.v1.transport.ChunkedOutput.writeShort(ChunkedOutput.java:95)
+	at org.neo4j.bolt.v1.packstream.PackStream$Packer.packStructHeader(PackStream.java:440)
+	at org.neo4j.bolt.v1.messaging.BoltResponseMessageWriter.onSuccess(BoltResponseMessageWriter.java:89)
+	at org.neo4j.bolt.v1.messaging.MessageProcessingHandler.onFinish(MessageProcessingHandler.java:100)
+	at org.neo4j.bolt.v1.runtime.BoltStateMachine.after(BoltStateMachine.java:109)
+	at org.neo4j.bolt.v1.runtime.BoltStateMachine.reset(BoltStateMachine.java:182)
+	at org.neo4j.bolt.v1.messaging.BoltMessageRouter.lambda$onReset$2(BoltMessageRouter.java:86)
+	at org.neo4j.bolt.v1.runtime.concurrent.RunnableBoltWorker.execute(RunnableBoltWorker.java:139)
+	at org.neo4j.bolt.v1.runtime.concurrent.RunnableBoltWorker.executeBatch(RunnableBoltWorker.java:132)
+	at org.neo4j.bolt.v1.runtime.concurrent.RunnableBoltWorker.run(RunnableBoltWorker.java:97)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:748)
+	at org.neo4j.helpers.NamedThreadFactory$2.run(NamedThreadFactory.java:109)
+2017-12-18 11:13:44.420+0000 INFO [o.n.k.i.a.i.IndexPopulationJob] Index population started: [:Title(name) [provider: {key=lucene+native, version=1.0}]]
+2017-12-18 11:13:44.595+0000 INFO [o.n.k.i.a.i.IndexPopulationJob] Completed node store scan. Flushing all pending updates.
+BatchingMultipleIndexPopulator{activeTasks=1, executor=java.util.concurrent.ThreadPoolExecutor@27b8e8a7[Running, pool size = 1, active threads = 1, queued tasks = 0, completed tasks = 0], batchedUpdates = [0 updates], queuedUpdates = 0}
+2017-12-18 11:13:44.595+0000 INFO [o.n.k.i.a.i.IndexPopulationJob] Shutting down executor.
+BatchingMultipleIndexPopulator{activeTasks=2, executor=java.util.concurrent.ThreadPoolExecutor@27b8e8a7[Running, pool size = 2, active threads = 2, queued tasks = 0, completed tasks = 0], batchedUpdates = [0 updates], queuedUpdates = 0}
+2017-12-18 11:13:44.802+0000 INFO [o.n.k.i.a.i.IndexPopulationJob] Index population completed. Index is now online: [:Title(name) [provider: {key=lucene+native, version=1.0}]]
+2017-12-18 11:13:49.139+0000 INFO [o.n.k.i.t.l.c.CheckPointerImpl] Check Pointing triggered by scheduler for time threshold [123]:  Starting check pointing...
+2017-12-18 11:13:49.139+0000 INFO [o.n.k.i.t.l.c.CheckPointerImpl] Check Pointing triggered by scheduler for time threshold [123]:  Starting store flush...
+2017-12-18 11:13:49.570+0000 INFO [o.n.k.i.s.c.CountsTracker] About to rotate counts store at transaction 123 to [/home/hariprasad/work/neo4j/db/neo4j/development/data/databases/graph.db/neostore.counts.db.b], from [/home/hariprasad/work/neo4j/db/neo4j/development/data/databases/graph.db/neostore.counts.db.a].
+2017-12-18 11:13:49.570+0000 INFO [o.n.k.i.s.c.CountsTracker] Successfully rotated counts store at transaction 123 to [/home/hariprasad/work/neo4j/db/neo4j/development/data/databases/graph.db/neostore.counts.db.b], from [/home/hariprasad/work/neo4j/db/neo4j/development/data/databases/graph.db/neostore.counts.db.a].
+2017-12-18 11:13:49.636+0000 INFO [o.n.k.i.t.l.c.CheckPointerImpl] Check Pointing triggered by scheduler for time threshold [123]:  Store flush completed
+2017-12-18 11:13:49.636+0000 INFO [o.n.k.i.t.l.c.CheckPointerImpl] Check Pointing triggered by scheduler for time threshold [123]:  Starting appending check point entry into the tx log...
+2017-12-18 11:13:49.657+0000 INFO [o.n.k.i.t.l.c.CheckPointerImpl] Check Pointing triggered by scheduler for time threshold [123]:  Appending check point entry into the tx log completed
+2017-12-18 11:13:49.658+0000 INFO [o.n.k.i.t.l.c.CheckPointerImpl] Check Pointing triggered by scheduler for time threshold [123]:  Check pointing completed
+2017-12-18 11:13:49.658+0000 INFO [o.n.k.i.t.l.p.LogPruningImpl] Log Rotation [0]:  Starting log pruning.
+2017-12-18 11:13:49.658+0000 INFO [o.n.k.i.t.l.p.LogPruningImpl] Log Rotation [0]:  Log pruning complete.
+2017-12-18 11:40:49.678+0000 INFO [o.n.k.i.t.l.c.CheckPointerImpl] Check Pointing triggered by scheduler for time threshold [124]:  Starting check pointing...
+2017-12-18 11:40:49.678+0000 INFO [o.n.k.i.t.l.c.CheckPointerImpl] Check Pointing triggered by scheduler for time threshold [124]:  Starting store flush...
+2017-12-18 11:40:50.117+0000 INFO [o.n.k.i.s.c.CountsTracker] About to rotate counts store at transaction 124 to [/home/hariprasad/work/neo4j/db/neo4j/development/data/databases/graph.db/neostore.counts.db.a], from [/home/hariprasad/work/neo4j/db/neo4j/development/data/databases/graph.db/neostore.counts.db.b].
+2017-12-18 11:40:50.118+0000 INFO [o.n.k.i.s.c.CountsTracker] Successfully rotated counts store at transaction 124 to [/home/hariprasad/work/neo4j/db/neo4j/development/data/databases/graph.db/neostore.counts.db.a], from [/home/hariprasad/work/neo4j/db/neo4j/development/data/databases/graph.db/neostore.counts.db.b].
+2017-12-18 11:40:50.208+0000 INFO [o.n.k.i.t.l.c.CheckPointerImpl] Check Pointing triggered by scheduler for time threshold [124]:  Store flush completed
+2017-12-18 11:40:50.208+0000 INFO [o.n.k.i.t.l.c.CheckPointerImpl] Check Pointing triggered by scheduler for time threshold [124]:  Starting appending check point entry into the tx log...
+2017-12-18 11:40:50.234+0000 INFO [o.n.k.i.t.l.c.CheckPointerImpl] Check Pointing triggered by scheduler for time threshold [124]:  Appending check point entry into the tx log completed
+2017-12-18 11:40:50.234+0000 INFO [o.n.k.i.t.l.c.CheckPointerImpl] Check Pointing triggered by scheduler for time threshold [124]:  Check pointing completed
+2017-12-18 11:40:50.234+0000 INFO [o.n.k.i.t.l.p.LogPruningImpl] Log Rotation [0]:  Starting log pruning.
+2017-12-18 11:40:50.234+0000 INFO [o.n.k.i.t.l.p.LogPruningImpl] Log Rotation [0]:  Log pruning complete.
+2017-12-18 12:02:15.355+0000 ERROR [o.n.b.v.t.BoltMessagingProtocolV1Handler] Failed to write response to driver Network channel towards /172.16.19.239:52016 is closed. Client has probably been stopped.
+org.neo4j.bolt.v1.packstream.PackOutputClosedException: Network channel towards /172.16.19.239:52016 is closed. Client has probably been stopped.
+	at org.neo4j.bolt.v1.transport.ChunkedOutput.ensure(ChunkedOutput.java:166)
+	at org.neo4j.bolt.v1.transport.ChunkedOutput.writeShort(ChunkedOutput.java:95)
+	at org.neo4j.bolt.v1.packstream.PackStream$Packer.packStructHeader(PackStream.java:440)
+	at org.neo4j.bolt.v1.messaging.BoltResponseMessageWriter.onSuccess(BoltResponseMessageWriter.java:89)
+	at org.neo4j.bolt.v1.messaging.MessageProcessingHandler.onFinish(MessageProcessingHandler.java:100)
+	at org.neo4j.bolt.v1.runtime.BoltStateMachine.after(BoltStateMachine.java:109)
+	at org.neo4j.bolt.v1.runtime.BoltStateMachine.reset(BoltStateMachine.java:182)
+	at org.neo4j.bolt.v1.messaging.BoltMessageRouter.lambda$onReset$2(BoltMessageRouter.java:86)
+	at org.neo4j.bolt.v1.runtime.concurrent.RunnableBoltWorker.execute(RunnableBoltWorker.java:139)
+	at org.neo4j.bolt.v1.runtime.concurrent.RunnableBoltWorker.run(RunnableBoltWorker.java:92)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:748)
+	at org.neo4j.helpers.NamedThreadFactory$2.run(NamedThreadFactory.java:109)
+2017-12-18 12:02:17.691+0000 INFO [o.n.c.i.ExecutionEngine] Discarded stale query from the query cache after 1298 seconds: MATCH (n:Title) RETURN n LIMIT 25
+2017-12-18 12:02:17.696+0000 INFO [o.n.c.i.CommunityCompatibilityFactory] Discarded stale query from the query cache after 1298 seconds: MATCH (n:Title) RETURN n LIMIT 25
+2017-12-18 12:02:20.248+0000 INFO [o.n.k.i.t.l.c.CheckPointerImpl] Check Pointing triggered by scheduler for time threshold [125]:  Starting check pointing...
+2017-12-18 12:02:20.248+0000 INFO [o.n.k.i.t.l.c.CheckPointerImpl] Check Pointing triggered by scheduler for time threshold [125]:  Starting store flush...
+2017-12-18 12:02:20.757+0000 INFO [o.n.k.i.s.c.CountsTracker] About to rotate counts store at transaction 125 to [/home/hariprasad/work/neo4j/db/neo4j/development/data/databases/graph.db/neostore.counts.db.b], from [/home/hariprasad/work/neo4j/db/neo4j/development/data/databases/graph.db/neostore.counts.db.a].
+2017-12-18 12:02:20.758+0000 INFO [o.n.k.i.s.c.CountsTracker] Successfully rotated counts store at transaction 125 to [/home/hariprasad/work/neo4j/db/neo4j/development/data/databases/graph.db/neostore.counts.db.b], from [/home/hariprasad/work/neo4j/db/neo4j/development/data/databases/graph.db/neostore.counts.db.a].
+2017-12-18 12:02:20.927+0000 INFO [o.n.k.i.t.l.c.CheckPointerImpl] Check Pointing triggered by scheduler for time threshold [125]:  Store flush completed
+2017-12-18 12:02:20.927+0000 INFO [o.n.k.i.t.l.c.CheckPointerImpl] Check Pointing triggered by scheduler for time threshold [125]:  Starting appending check point entry into the tx log...
+2017-12-18 12:02:20.952+0000 INFO [o.n.k.i.t.l.c.CheckPointerImpl] Check Pointing triggered by scheduler for time threshold [125]:  Appending check point entry into the tx log completed
+2017-12-18 12:02:20.952+0000 INFO [o.n.k.i.t.l.c.CheckPointerImpl] Check Pointing triggered by scheduler for time threshold [125]:  Check pointing completed
+2017-12-18 12:02:20.952+0000 INFO [o.n.k.i.t.l.p.LogPruningImpl] Log Rotation [0]:  Starting log pruning.
+2017-12-18 12:02:20.952+0000 INFO [o.n.k.i.t.l.p.LogPruningImpl] Log Rotation [0]:  Log pruning complete.
