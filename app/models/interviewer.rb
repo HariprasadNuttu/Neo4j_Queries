@@ -151,7 +151,7 @@ class Interviewer < ApplicationRecord
 
   def self.search_with_skill_and_level(params)
     puts "search_with_skill_and_level"
-    response = RestClient.post "#{$neo4j_urls['url']}/db/data/cypher", {"query":"UNWIND {skills_list} as skill_name match(interviewer:Freelancer)-[:Has_experience{level:{level}}]->(skill:Skill{name:skill_name})  RETURN {interviewers:interviewer{.*}} as object","params":{"skills_list":params[:keyword].split(/, |,/),"level":params[:level]}}.to_json,:content_type =>"application/json";
+    response = RestClient.post "#{$neo4j_urls['url']}/db/data/cypher", {"query":"UNWIND {skills_list} as skill_name match(interviewer:Freelancer)-[:Has_experience{level:{level}}]->(skill:Skill) where skill.name =~ ('(?i)'+ skill_name) with DISTINCT interviewer as interviewer_data  RETURN {interviewers:interviewer_data{.*}} as object ORDER BY interviewer_data.name ","params":{"skills_list":params[:keyword].split(/, |,/),"level":params[:level]}}.to_json,:content_type =>"application/json";
 
     # interviewers_data = JSON.parse(response.body)["data"]
     interviewers= JSON.parse(response.body)["data"].collect{|object| object[0]["interviewers"]}
@@ -160,7 +160,7 @@ class Interviewer < ApplicationRecord
   end
   def self.search_with_skill(params)
     puts "search_with_skill"
-    response = RestClient.post "#{$neo4j_urls['url']}/db/data/cypher", {"query":"UNWIND {skills_list} as skill_name match(interviewer:Freelancer)-[:Has_experience]->(skill:Skill{name:skill_name})  RETURN {interviewers:interviewer{.*}} as object","params":{"skills_list":params[:keyword].split(/, |,/)}}.to_json,:content_type =>"application/json";
+    response = RestClient.post "#{$neo4j_urls['url']}/db/data/cypher", {"query":"UNWIND {skills_list} as skill_name match(interviewer:Freelancer)-[:Has_experience]->(skill:Skill) where skill.name =~ ('(?i)'+ skill_name) with DISTINCT interviewer as interviewer_data  RETURN {interviewers:interviewer_data{.*}} as object ORDER BY interviewer_data.name ","params":{"skills_list":params[:keyword].split(/, |,/)}}.to_json,:content_type =>"application/json";
 
     interviewers= JSON.parse(response.body)["data"].collect{|object| object[0]["interviewers"]}
     puts "#{interviewers}"
@@ -168,21 +168,21 @@ class Interviewer < ApplicationRecord
   end
   def self.search_with_level(params)
     puts "search_with_level"
-    response = RestClient.post "#{$neo4j_urls['url']}/db/data/cypher", {"query":"match(interviewer:Freelancer)-[:Has_experience{level:{level}}]->(skill:Skill)  WITH DISTINCT interviewer as interviewer_data RETURN  {interviewers:interviewer_data{.*}} as object","params":{"level":params[:level]}}.to_json,:content_type =>"application/json";
+    response = RestClient.post "#{$neo4j_urls['url']}/db/data/cypher", {"query":"match(interviewer:Freelancer)-[:Has_experience{level:{level}}]->(skill:Skill)  WITH DISTINCT interviewer as interviewer_data RETURN  {interviewers:interviewer_data{.*}} as object ORDER BY interviewer_data.name ","params":{"level":params[:level]}}.to_json,:content_type =>"application/json";
 
     interviewers= JSON.parse(response.body)["data"].collect{|object| object[0]["interviewers"]}
     puts "#{interviewers}"
     interviewers
   end
 
-  
+
   def self.import_data
     CSV.foreach("new_interviewers.csv",:headers => true) do |row|
       interviewer = Interviewer.new name:row[0],email:row[1],title:row[3],skills:row[4],languages_set:row[7],skill_set:row[5],languages:row[6],domain:row[2]
       if interviewer.save
         puts "#{interviewer}"
       end
-      end
+    end
 
   end
 end
