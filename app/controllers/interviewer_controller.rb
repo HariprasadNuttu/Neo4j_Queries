@@ -21,8 +21,9 @@ class InterviewerController < ApplicationController
     interviewers = Interviewer.match_interviewers(params)
     render json:{success:true,interviewers:interviewers,message:["Interviewers list"]}
   end
-  def domain_based_interviewers
-
+  def domain_based
+    interviewers = Interviewer.domain_based(params)
+    render json:{success:true,interviewers:interviewers,message:["Interviewers list"]}
   end
 
   private

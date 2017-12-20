@@ -5,5 +5,6 @@ Rails.application.routes.draw do
   match "/get_titles" => "interviewer#get_title", via: :get
   match "/get_skills" => "interviewer#get_skills", via: :get
   match "/match_interviewers" => "interviewer#match_interviewers", via: :get
+    match "/domain_based" => "interviewer#domain_based", via: :get
 
 end

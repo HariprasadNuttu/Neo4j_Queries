@@ -148,6 +148,22 @@ class Interviewer < ApplicationRecord
   end
 
 
+  def self.domain_based(params)
+    puts "#{params}"
+    if params[:domain] && params[:language]
+      puts "Both are satisified"
+      self.search_with_domain_and_language(params)
+    elsif params[:domain]
+      puts "Domain"
+      self.search_with_domain(params)
+    elsif params[:language]
+      puts "Only level"
+      self.search_with_language(params)
+    end
+
+  end
+
+
 
   def self.search_with_skill_and_level(params)
     puts "search_with_skill_and_level"
@@ -175,7 +191,33 @@ class Interviewer < ApplicationRecord
     interviewers
   end
 
+  def self.search_with_language(params)
+    puts "search_with_language"
+    response = RestClient.post "#{$neo4j_urls['url']}/db/data/cypher", {"query":"MATCH p=(interviewer:Freelancer)-[r:Understands]->(language:Languages) where language.name =~ ('(?i)'+ {language})  with DISTINCT interviewer as interviewer_data  RETURN {interviewers:interviewer_data{.*}} as object ORDER BY interviewer_data.name ","params":{"language":params[:language]}}.to_json,:content_type =>"application/json";
 
+    # interviewers_data = JSON.parse(response.body)["data"]
+    interviewers= JSON.parse(response.body)["data"].collect{|object| object[0]["interviewers"]}
+    puts "#{interviewers}"
+    interviewers
+  end
+
+  def self.search_with_domain(params)
+    puts "search_with_domain"
+    response = RestClient.post "#{$neo4j_urls['url']}/db/data/cypher", {"query":"MATCH p=(interviewer:Freelancer)-[r:Has_Knowledge]->(domain:Domains) where domain.name =~ ('(?i)'+ {domain})  with DISTINCT interviewer as interviewer_data  RETURN {interviewers:interviewer_data{.*}} as object ORDER BY interviewer_data.name ","params":{"domain":params[:domain]}}.to_json,:content_type =>"application/json";
+
+    interviewers= JSON.parse(response.body)["data"].collect{|object| object[0]["interviewers"]}
+    puts "#{interviewers}"
+    interviewers
+  end
+  def self.search_with_domain_and_language(params)
+    puts "search_with_domain_and_language"
+    response = RestClient.post "#{$neo4j_urls['url']}/db/data/cypher", {"query":"match p = (domain:Domains{name:{domain_name}})<-[r:Has_Knowledge]-(interviewer:Freelancer)-[:Understands]->(language:Languages{name:{language}}) with DISTINCT interviewer as interviewer_data  RETURN {interviewers:interviewer_data{.*}} as object ORDER BY interviewer_data.name ","params":{"domain_name":params[:domain],"language":params[:language]}}.to_json,
+      :content_type =>"application/json";
+
+    interviewers= JSON.parse(response.body)["data"].collect{|object| object[0]["interviewers"]}
+    puts "#{interviewers}"
+    interviewers
+  end
   def self.import_data
     CSV.foreach("new_interviewers.csv",:headers => true) do |row|
       interviewer = Interviewer.new name:row[0],email:row[1],title:row[3],skills:row[4],languages_set:row[7],skill_set:row[5],languages:row[6],domain:row[2]
