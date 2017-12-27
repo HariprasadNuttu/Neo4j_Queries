@@ -4,8 +4,8 @@ namespace :neo4j do
   task create_nodes: :environment do
 
     puts "=============Create Interviewer Node Start=========="
-    create_interviewer = RestClient.post "#{$neo4j_urls['url']}/db/data/cypher", {"query":"Create constraint on(interviewer:Freelancer) Assert interviewer.interviewer_id is unique"}.to_json, :content_type =>"application/json";
-    create_interviewer_index = RestClient.post "#{$neo4j_urls['url']}/db/data/cypher", {"query":"Create index on:Freelancer(skill_set)"}.to_json, :content_type =>"application/json";
+    create_interviewer = RestClient.post "#{$neo4j_urls['url']}/db/data/cypher", {"query":"Create constraint on(interviewer:Interviewer) Assert interviewer.interviewer_id is unique"}.to_json, :content_type =>"application/json";
+    create_interviewer_index = RestClient.post "#{$neo4j_urls['url']}/db/data/cypher", {"query":"Create index on:Interviewer(skill_set)"}.to_json, :content_type =>"application/json";
 
     puts "#{create_interviewer}"
     puts "#{create_interviewer_index}"
