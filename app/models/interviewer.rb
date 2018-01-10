@@ -55,7 +55,7 @@ class Interviewer < ApplicationRecord
   end
 
   def self.get_skills(name)
-    skills = {"query":"match (skill:Skill) where toLower(skill.name) =~{name} return skill.name LIMIT 25" ,"params":{"name":"(?i).*"+name.downcase+".*"}}
+    skills = {"query":"match (skill:Skill) where toLower(skill.name) =~{name} return skill.name LIMIT 25" ,"params":{"name":"(?i)"+name.downcase+".*"}}
     skills_response = Neo4jModule.post(skills)
     response = JSON.parse(skills_response.body)["data"].collect{|object| object[0]}
     response
@@ -198,8 +198,8 @@ puts "=========================="
 
     worked_as = {"query":"match (interviewer:Freelancer {interviewer_id:{id}}),(title:Title) where title.name = interviewer.title merge (interviewer)-[:Worked_As]->(title) return interviewer,title","params":{"id":self.id.to_i}}
 
-    result = {"query":"match (interviewer:Freelancer {interviewer_id:{id}}),(location:Location) where location.name = interviewer.location  return interviewer,location","params":{"id":self.id.to_i}}
-    puts "#{result}"
+    # has_expertise = {"query":"match (interviewer:Freelancer {interviewer_id:{id}}),(expertise:Expertise) where expertise.name IN interviewer.domain foreach (object IN interviewer.domain |
+    # foreach (k in (case when object=expertise.name  then [1] else [] end) | merge (interviewer)-[:Has_Expertise]->(expertise))) return interviewer,domain","params":{"id":self.id.to_i}}
 
     has_location = {"query":"match (interviewer:Freelancer {interviewer_id:{id}}),(location:Location) where location.name = interviewer.location merge (interviewer)-[:Has_Location]->(location) return interviewer,location","params":{"id":self.id.to_i}}
 puts "#{has_location}"
