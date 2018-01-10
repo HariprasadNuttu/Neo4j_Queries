@@ -1,2 +1,20 @@
 development:
-  url: http://172.16.19.70:8500
+  url: http://172.16.19.34:7474
+
+
+
+
+
+#
+# Interviewer.create("title"=>"java", "resume"=>"Hariprasad Nuttu", "audio_bio"=>"hariprasadnuttu@mailinator.com","video_bio"=>"Accommodation,Administrative and Support Services", "highest_degree"=>"English-Fluent,Mandarin-Native", "skillset"=>"Oracle Adaptive Access Manager-Competent,CSS-Proficient")
+
+
+  # skills=[]
+  #   languages=[]
+  #   self.skillset.split(",").each do|skill|
+  #       skills.push(skill.split('-')[0])
+  #   end
+  #   self.highest_degree.split(",").each do|skill|
+  #       languages.push(skill.split('-')[0])
+  #   end
+  #   interviewer_data={"name":self.resume,"email":self.audio_bio,title:self.title,skills:self.skillset.split(","),languages:self.highest_degree.split(","),interviewer_id:self.id.to_i,skill_set:skills,languages_set:languages,domain: self.video_bio ? self.video_bio.split(",") : nil }

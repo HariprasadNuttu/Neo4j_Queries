@@ -38,3 +38,7 @@ gem 'rest-client', '~> 2.0', '>= 2.0.2'
 gem 'neography'
 
 gem 'rack-cors', :require => 'rack/cors'
+
+
+gem 'searchkick'
+gem 'rufus-scheduler', '~> 3.1.1'

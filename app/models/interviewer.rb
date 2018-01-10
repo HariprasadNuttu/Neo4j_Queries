@@ -8,7 +8,13 @@ class Interviewer < ApplicationRecord
   # after_create :create_interviewer
   # after_update :update_interviewer
   # after_destroy :destroy_interviewer
-
+  #   searchkick word_start: [:name]
+  #   def search_data
+  #   {
+  #     name: self.name,
+  #
+  #   }
+  # end
 
   after_create :build_node
   after_update :update_node
@@ -57,6 +63,7 @@ class Interviewer < ApplicationRecord
 
   def self.match_interviewers(params)
     puts "#{params}"
+   puts "#{params[:total_yrs_of_exp].to_i}"
     # if params[:keyword] && params[:level]
     #   puts "Both are satisified"
     #   self.search_with_skill_and_level(params)
@@ -67,9 +74,27 @@ class Interviewer < ApplicationRecord
     #   puts "Only level"
     #   self.search_with_level(params)
     # end
+    # keyword = params[:keyword] ? 'UNWIND {skills_list} as skill_name' : ''
+    # search_with_skill_ignore_case =  params[:keyword] ? "where skill.name =~ ('(?i)'+ skill_name)" : ''
+    keyword = params[:keyword] ? 'with {skills_list} as data' : ''
+    search_with_skill_ignore_case =  params[:keyword] ? " where TOLOWER(skill.name) IN data" : ''
     level = params[:level] ? '{level:{level}}': '';
-      skill_level = {"query":"UNWIND {skills_list} as skill_name match(interviewer:Freelancer)-[:Has_experience"+level+"]->(skill:Skill) where skill.name =~ ('(?i)'+ skill_name) with DISTINCT interviewer as interviewer_data  RETURN {interviewers:interviewer_data{.*}} as object ORDER BY interviewer_data.name" ,"params":{"skills_list":params[:keyword] ? params[:keyword].split(/, |,/) : ".*" ,"level":params[:level] ? params[:level] :''}}
+    language = params[:language] ? '{name:{language}}' : '';
+    domain = params[:domain] ? '{name:{domain}}' : '';
+    proficiency = params[:proficiency] ? '{Proficiency:{proficiency}}': '';
+    location = params[:location] ? '{name:{location}}': ''
+    yrs_of_exp = params[:total_yrs_of_exp] ? '{total_yrs_of_exp:{total_yrs_of_exp}}': ''
+  exp =   params[:total_yrs_of_exp].to_i
+#   skill_level = {"query":"UNWIND {skills_list} as skill_name match(skill:Skill)<-[:Has_experience"+level+"]-(interviewer:Freelancer)-[:Has_Knowledge]->(d:Domains"+domain+") where skill.name =~ ('(?i)'+ skill_name)  with DISTINCT interviewer as interviewer_data  RETURN {interviewers:interviewer_data{.*}} as object ORDER BY interviewer_data.name" ,"params":{"skills_list":params[:keyword] ? params[:keyword].split(/, |,/) : ".*" ,"level":level,"language":language,"domain":domain,"proficiency":proficiency}}
+# puts "#{skill_level}"
+      # skill_level = {"query":"UNWIND {skills_list} as skill_name match (skill:Skill)<-[:Has_experience"+level+"]- (interviewer:Freelancer"+yrs_of_exp+")-[:Has_Knowledge]->(d:Domains"+domain+") match(l:Languages"+language+")<-[:Understands"+proficiency+"]-(interviewer)-[:Has_Location]->(location:Location"+location+") where skill.name =~ ('(?i)'+ skill_name) with DISTINCT interviewer as interviewer_data  RETURN {interviewers:interviewer_data{.*}} as object ORDER BY interviewer_data.name" ,"params":{"skills_list":params[:keyword] ? params[:keyword].split(/, |,/) : ".*" ,"level":params[:level] ? params[:level] :'',"domain":params[:domain] ? params[:domain] :'',"proficiency":params[:proficiency] ? params[:proficiency] :'',"language":params[:language] ? params[:language] :'',"location":params[:location] ? params[:location] :'',"total_yrs_of_exp": params[:total_yrs_of_exp] ? exp :''}}
+      #
+      # skill_level = {"query":"match (interviewer:Freelancer)-[r:Has_experience]->(s:Skill{name:'Java'}) with DISTINCT interviewer as interviewer_data  RETURN {interviewers:interviewer_data{.*}} as object ORDER BY interviewer_data.name" ,"params":{"skills_list":params[:keyword] ? params[:keyword].split(/, |,/) : ".*" ,"level":params[:level] ? params[:level] :'',"domain":params[:domain] ? params[:domain] :'',"proficiency":params[:proficiency] ? params[:proficiency] :'',"language":params[:language] ? params[:language] :'',"location":params[:location] ? params[:location] :'',"total_yrs_of_exp": params[:total_yrs_of_exp] ? exp :''}}
 
+      skill_level = {"query":""+keyword+" match (skill:Skill)<-[:Has_experience"+level+"]-(interviewer:Freelancer"+yrs_of_exp+")-[:Has_Knowledge]-(domain:Domains"+domain+"),(language:Languages"+language+")<-[:Understands"+proficiency+"]-(interviewer)-[:Has_Location]->(location:Location"+location+") "+search_with_skill_ignore_case+" with DISTINCT interviewer as interviewer_data  RETURN {interviewers:interviewer_data{.*}} as object ORDER BY interviewer_data.name" ,"params":{"skills_list":params[:keyword] ? params[:keyword].split(/, |,/).map {|key| key.downcase} : ".*" ,"level":params[:level] ? params[:level] :'',"domain":params[:domain] ? params[:domain] :'',"proficiency":params[:proficiency] ? params[:proficiency] :'',"language":params[:language] ? params[:language] :'',"location":params[:location] ? params[:location] :'',"total_yrs_of_exp": params[:total_yrs_of_exp] ? exp :''}}
+      puts "====================="
+puts "#{skill_level}"
+puts "=========================="
     response = Neo4jModule.post(skill_level)
     JSON.parse(response.body)["data"].collect{|object| object[0]["interviewers"]}
 
@@ -143,8 +168,10 @@ class Interviewer < ApplicationRecord
   end
 
   def interviewer_profile
-    interviewer_data={"name":self.name,"email":self.email,title:self.title,skills:self.skills.split(","),languages:self.languages.split(","),interviewer_id:self.id.to_i,skill_set:self.skill_set.split(','),languages_set:self.languages_set.split(","),domain: domain ? self.domain.split(",") : nil }
+    interviewer_data={"name":self.name,"email":self.email,title:self.title,skills:self.skills.split(","),languages:self.languages.split(","),interviewer_id:self.id.to_i,skill_set:self.skill_set.split(','),languages_set:self.languages_set.split(","),domain: domain ? self.domain.split(",") : nil ,location:self.location,total_yrs_of_exp:self.total_yrs_of_exp.to_i}
+    # location,total_yrs_of_exp
     interviewer_data
+
   end
 
   def build_relationship
@@ -158,7 +185,11 @@ class Interviewer < ApplicationRecord
 
     worked_as = {"query":"match (interviewer:Freelancer {interviewer_id:{id}}),(title:Title) where title.name = interviewer.title merge (interviewer)-[:Worked_As]->(title) return interviewer,title","params":{"id":self.id.to_i}}
 
-    relationship = [has_experience,understands,has_knowledge,worked_as]
+
+
+    has_location = {"query":"match (interviewer:Freelancer {interviewer_id:{id}}),(location:Location) where location.name = interviewer.location merge (interviewer)-[:Has_Location]->(location) return interviewer,location","params":{"id":self.id.to_i}}
+puts "#{has_location}"
+    relationship = [has_experience,understands,has_knowledge,worked_as,has_location]
 
     relationship
 
@@ -401,7 +432,8 @@ class Interviewer < ApplicationRecord
   end
 
   def self.search_with_domain(params)
-    puts "search_with_domain"
+    puts "search_wit:"UNWIND {skills_list} as skill_name match(skill:Skill)<-[:Has_experience"+level+"]-(interviewer:Freelancer)-[:Has_Knowledge]->(d:Domains"+domain+") where skill.name =~ ('(?i)'+ skill_name)  with DISTINCT interviewer as interviewer_data  RETURN {interviewers:interviewer_data{.*}} as object ORDER BY interviewer_data.name" ,"params":{"skills_list":params[:keyword] ? params[:keyword].split(/, |,/) : ".*" ,"level":level,"language":language,"domain":domain,"proficiency":proficiency}}
+# puts "#{skill_level}"h_domain"
     response = RestClient.post "#{$neo4j_urls['url']}/db/data/cypher", {"query":"MATCH p=(interviewer:Freelancer)-[r:Has_Knowledge]->(domain:Domains) where domain.name =~ ('(?i)'+ {domain})  with DISTINCT interviewer as interviewer_data  RETURN {interviewers:interviewer_data{.*}} as object ORDER BY interviewer_data.name ","params":{"domain":params[:domain]}}.to_json,:content_type =>"application/json";
 
     interviewers= JSON.parse(response.body)["data"].collect{|object| object[0]["interviewers"]}
@@ -410,7 +442,8 @@ class Interviewer < ApplicationRecord
   end
   def self.search_with_domain_and_language(params)
     puts "search_with_domain_and_language"
-    response = RestClient.post "#{$neo4j_urls['url']}/db/data/cypher", {"query":"match p = (domain:Domains{name:{domain_name}})<-[r:Has_Knowledge]-(interviewer:Freelancer)-[:Understands]->(language:Languages{name:{language}}) with DISTINCT interviewer as interviewer_data  RETURN {interviewers:interviewer_data{.*}} as object ORDER BY interviewer_data.name ","params":{"domain_name":params[:domain],"language":params[:language]}}.to_json,
+    response = RestClient.post "#{$neo4j_urls['url']}/db/data/cypher", {"query":"match p = (domain:Domains{name:{domain_name}})<-[r:Has_Knowledge]-(interviewer:Freelancer)-[:Understands]->(language:Languages{name:{language}}) with DISTINCT interviewer as interviewer_data  RETURN {interviewers:interviewer_data{.*}} as object ORDER BY interviewer_data:"UNWIND {skills_list} as skill_name match(skill:Skill)<-[:Has_experience"+level+"]-(interviewer:Freelancer)-[:Has_Knowledge]->(d:Domains"+domain+") where skill.name =~ ('(?i)'+ skill_name)  with DISTINCT interviewer as interviewer_data  RETURN {interviewers:interviewer_data{.*}} as object ORDER BY interviewer_data.name" ,"params":{"skills_list":params[:keyword] ? params[:keyword].split(/, |,/) : ".*" ,"level":level,"language":language,"domain":domain,"proficiency":proficiency}}
+# puts "#{skill_level}".name ","params":{"domain_name":params[:domain],"language":params[:language]}}.to_json,
     :content_type =>"application/json";
 
     interviewers= JSON.parse(response.body)["data"].collect{|object| object[0]["interviewers"]}
@@ -429,3 +462,25 @@ class Interviewer < ApplicationRecord
 
 =end
 end
+
+
+
+
+# match(skill:Skill{name:"Java"})<-[:Has_experience{level:"Proficient"}]-(interviewer:Freelancer)-[:Has_Knowledge]->(d:Domains{name:"Accommodation"}) match(interviewer)-[:Understands{Proficiency:"Native"}]->(l:Languages{name:"English"}) return interviewer
+
+
+
+# skill_level = {"query":"UNWIND {skills_list} as skill_name match(skill:Skill)<-[:Has_experience"+level+"]-(interviewer:Freelancer)-[:Has_Knowledge]->(d:Domains"+domain+") where skill.name =~ ('(?i)'+ skill_name)  with DISTINCT interviewer as interviewer_data  RETURN {interviewers:interviewer_data{.*}} as object ORDER BY interviewer_data.name" ,"params":{"skills_list":params[:keyword] ? params[:keyword].split(/, |,/) : ".*" ,"level":level,"language":language,"domain":domain,"proficiency":proficiency}}
+# puts "#{skill_level}"
+
+
+
+
+
+# matched query
+# skill_level = {"query":"UNWIND {skills_list} as skill_name match (skill:Skill)<-[:Has_experience"+level+"]- (interviewer:Freelancer)-[:Has_Knowledge]->(d:Domains"+domain+") where skill.name =~ ('(?i)'+ skill_name) with DISTINCT interviewer as interviewer_data  RETURN {interviewers:interviewer_data{.*}} as object ORDER BY interviewer_data.name" ,"params":{"skills_list":params[:keyword] ? params[:keyword].split(/, |,/) : ".*" ,"level":params[:level] ? params[:level] :'',"domain":params[:domain] ? params[:domain] :''}}
+#
+
+
+
+# Interviewer.create(name: "Hariprasad Nuttu", email: "hariprasadnuttu@gmail.com", skill_set:"Java","Ruby" , title: "Java Developer", languages:"English-Fluent","Mandarin-Native", expertise: nil, languages_set: "English","Mandarin" , skills: "Java-Competent","Ruby-Expert", domain: "Accommodation", location: "India", total_yrs_of_exp: 3 )
