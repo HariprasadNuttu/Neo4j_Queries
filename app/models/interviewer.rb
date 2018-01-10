@@ -77,21 +77,34 @@ class Interviewer < ApplicationRecord
     # keyword = params[:keyword] ? 'UNWIND {skills_list} as skill_name' : ''
     # search_with_skill_ignore_case =  params[:keyword] ? "where skill.name =~ ('(?i)'+ skill_name)" : ''
     keyword = params[:keyword] ? 'with {skills_list} as data' : ''
-    search_with_skill_ignore_case =  params[:keyword] ? " where TOLOWER(skill.name) IN data" : ''
+    # search_with_skill_ignore_case =  params[:keyword] ? " where TOLOWER(skill.name) IN data" : ''
     level = params[:level] ? '{level:{level}}': '';
     language = params[:language] ? '{name:{language}}' : '';
     domain = params[:domain] ? '{name:{domain}}' : '';
     proficiency = params[:proficiency] ? '{Proficiency:{proficiency}}': '';
     location = params[:location] ? '{name:{location}}': ''
-    yrs_of_exp = params[:total_yrs_of_exp] ? '{total_yrs_of_exp:{total_yrs_of_exp}}': ''
+    # yrs_of_exp = params[:total_yrs_of_exp] ? '{total_yrs_of_exp:{total_yrs_of_exp}}': ''
+    search_with_skill_ignore_case=''
   exp =   params[:total_yrs_of_exp].to_i
+  if(params[:keyword] && params[:total_yrs_of_exp])
+      yrs_of_exp = '';
+      search_with_skill_ignore_case = " where TOLOWER(skill.name) IN data AND interviewer.total_yrs_of_exp >= {total_yrs_of_exp} ";
+  elsif(params[:keyword])
+    search_with_skill_ignore_case = " where TOLOWER(skill.name) IN data" ;
+    yrs_of_exp =''
+  elsif(params[:total_yrs_of_exp])
+    # yrs_of_exp = '{total_yrs_of_exp:{total_yrs_of_exp}}';
+    search_with_skill_ignore_case = " where interviewer.total_yrs_of_exp >= {total_yrs_of_exp}" ;
+  end
+
 #   skill_level = {"query":"UNWIND {skills_list} as skill_name match(skill:Skill)<-[:Has_experience"+level+"]-(interviewer:Freelancer)-[:Has_Knowledge]->(d:Domains"+domain+") where skill.name =~ ('(?i)'+ skill_name)  with DISTINCT interviewer as interviewer_data  RETURN {interviewers:interviewer_data{.*}} as object ORDER BY interviewer_data.name" ,"params":{"skills_list":params[:keyword] ? params[:keyword].split(/, |,/) : ".*" ,"level":level,"language":language,"domain":domain,"proficiency":proficiency}}
 # puts "#{skill_level}"
       # skill_level = {"query":"UNWIND {skills_list} as skill_name match (skill:Skill)<-[:Has_experience"+level+"]- (interviewer:Freelancer"+yrs_of_exp+")-[:Has_Knowledge]->(d:Domains"+domain+") match(l:Languages"+language+")<-[:Understands"+proficiency+"]-(interviewer)-[:Has_Location]->(location:Location"+location+") where skill.name =~ ('(?i)'+ skill_name) with DISTINCT interviewer as interviewer_data  RETURN {interviewers:interviewer_data{.*}} as object ORDER BY interviewer_data.name" ,"params":{"skills_list":params[:keyword] ? params[:keyword].split(/, |,/) : ".*" ,"level":params[:level] ? params[:level] :'',"domain":params[:domain] ? params[:domain] :'',"proficiency":params[:proficiency] ? params[:proficiency] :'',"language":params[:language] ? params[:language] :'',"location":params[:location] ? params[:location] :'',"total_yrs_of_exp": params[:total_yrs_of_exp] ? exp :''}}
       #
       # skill_level = {"query":"match (interviewer:Freelancer)-[r:Has_experience]->(s:Skill{name:'Java'}) with DISTINCT interviewer as interviewer_data  RETURN {interviewers:interviewer_data{.*}} as object ORDER BY interviewer_data.name" ,"params":{"skills_list":params[:keyword] ? params[:keyword].split(/, |,/) : ".*" ,"level":params[:level] ? params[:level] :'',"domain":params[:domain] ? params[:domain] :'',"proficiency":params[:proficiency] ? params[:proficiency] :'',"language":params[:language] ? params[:language] :'',"location":params[:location] ? params[:location] :'',"total_yrs_of_exp": params[:total_yrs_of_exp] ? exp :''}}
 
-      skill_level = {"query":""+keyword+" match (skill:Skill)<-[:Has_experience"+level+"]-(interviewer:Freelancer"+yrs_of_exp+")-[:Has_Knowledge]-(domain:Domains"+domain+"),(language:Languages"+language+")<-[:Understands"+proficiency+"]-(interviewer)-[:Has_Location]->(location:Location"+location+") "+search_with_skill_ignore_case+" with DISTINCT interviewer as interviewer_data  RETURN {interviewers:interviewer_data{.*}} as object ORDER BY interviewer_data.name" ,"params":{"skills_list":params[:keyword] ? params[:keyword].split(/, |,/).map {|key| key.downcase} : ".*" ,"level":params[:level] ? params[:level] :'',"domain":params[:domain] ? params[:domain] :'',"proficiency":params[:proficiency] ? params[:proficiency] :'',"language":params[:language] ? params[:language] :'',"location":params[:location] ? params[:location] :'',"total_yrs_of_exp": params[:total_yrs_of_exp] ? exp :''}}
+      # skill_level = {"query":""+keyword+" match (skill:Skill)<-[:Has_experience"+level+"]-(interviewer:Freelancer"+yrs_of_exp+")-[:Has_Knowledge]-(domain:Domains"+domain+"),(language:Languages"+language+")<-[:Understands"+proficiency+"]-(interviewer)-[:Has_Location]->(location:Location"+location+") "+search_with_skill_ignore_case+" with DISTINCT interviewer as interviewer_data  RETURN {interviewers:interviewer_data{.*}} as object ORDER BY interviewer_data.name" ,"params":{"skills_list":params[:keyword] ? params[:keyword].split(/, |,/).map {|key| key.downcase} : ".*" ,"level":params[:level] ? params[:level] :'',"domain":params[:domain] ? params[:domain] :'',"proficiency":params[:proficiency] ? params[:proficiency] :'',"language":params[:language] ? params[:language] :'',"location":params[:location] ? params[:location] :'',"total_yrs_of_exp": params[:total_yrs_of_exp] ? exp :''}}
+        skill_level = {"query":""+keyword+" match (skill:Skill)<-[:Has_experience"+level+"]-(interviewer:Freelancer)-[:Has_Knowledge]-(domain:Domains"+domain+"),(language:Languages"+language+")<-[:Understands"+proficiency+"]-(interviewer)-[:Has_Location]->(location:Location"+location+") "+search_with_skill_ignore_case+" with DISTINCT interviewer as interviewer_data  RETURN {interviewers:interviewer_data{.*}} as object ORDER BY interviewer_data.name" ,"params":{"skills_list":params[:keyword] ? params[:keyword].split(/, |,/).map {|key| key.downcase} : ".*" ,"level":params[:level] ? params[:level] :'',"domain":params[:domain] ? params[:domain] :'',"proficiency":params[:proficiency] ? params[:proficiency] :'',"language":params[:language] ? params[:language] :'',"location":params[:location] ? params[:location] :'',"total_yrs_of_exp": params[:total_yrs_of_exp] ? exp :''}}
       puts "====================="
 puts "#{skill_level}"
 puts "=========================="
