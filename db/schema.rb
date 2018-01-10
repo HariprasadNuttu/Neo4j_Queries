@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171218091853) do
+ActiveRecord::Schema.define(version: 20180109102503) do
 
   create_table "interviewers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "name"
@@ -19,11 +19,13 @@ ActiveRecord::Schema.define(version: 20171218091853) do
     t.string   "title"
     t.string   "languages"
     t.string   "expertise"
-    t.datetime "created_at",    null: false
-    t.datetime "updated_at",    null: false
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
     t.string   "languages_set"
     t.string   "skills"
     t.string   "domain"
+    t.string   "location"
+    t.integer  "total_yrs_of_exp"
   end
 
 end
