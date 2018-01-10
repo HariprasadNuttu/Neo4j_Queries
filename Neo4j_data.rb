@@ -12,7 +12,7 @@ Interviewer.create(name: "Nandu", email: "nandu@gmail.com", skill_set:"JavaScrip
 
 
 
-Interviewer.create(name: "harsh", email: "harsh@gmail.com", skill_set:"java,ruby" , title: "Java Developer", languages:"English-Fluent,Mandarin-Native", expertise: nil, languages_set: "English,Mandarin" , skills: "Java-Competent,Ruby-Expert", domain: "Accommodation", location: "India", total_yrs_of_exp: 3 )
+Interviewer.create(name: "harsh", email: "harsh@gmail.com", skill_set:"PHP,Ruby" , title: "Java Developer", languages:"English-Fluent,Mandarin-Native", expertise: nil, languages_set: "English,Mandarin" , skills: "PHP-Competent,Ruby-Expert", domain: "Accommodation", location: "India", total_yrs_of_exp: 3 )
 
 
 Interviewer.create(name: "Chandu", email: "chandu@gmail.com", skill_set:"Java,Ruby" , title: "Java Developer", languages:"English-Fluent,Mandarin-Native", expertise: nil, languages_set: "English,Mandarin" , skills: "Java-Expert,Ruby-Expert", domain: "Air Transportation", location: "China", total_yrs_of_exp: 4 )

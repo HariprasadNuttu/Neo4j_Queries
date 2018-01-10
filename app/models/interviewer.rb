@@ -168,7 +168,7 @@ puts "=========================="
   end
 
   def interviewer_profile
-    interviewer_data={"name":self.name,"email":self.email,title:self.title,skills:self.skills.split(","),languages:self.languages.split(","),interviewer_id:self.id.to_i,skill_set:self.skill_set.split(','),languages_set:self.languages_set.split(","),domain: domain ? self.domain.split(",") : nil ,location:self.location,total_yrs_of_exp:self.total_yrs_of_exp.to_i}
+    interviewer_data={"name":self.name,"email":self.email,title:self.title,skills:self.skills.split(/, |,/) , languages:self.languages.split(/, |,/) , interviewer_id:self.id.to_i,skill_set:self.skill_set.split(/, |,/), languages_set:self.languages_set.split(/, |,/),domain: domain ? self.domain.split(/, |,/) : nil ,location:self.location,total_yrs_of_exp:self.total_yrs_of_exp.to_i}
     # location,total_yrs_of_exp
     interviewer_data
 
@@ -176,7 +176,7 @@ puts "=========================="
 
   def build_relationship
 
-    has_experience = {"query":"match (interviewer:Freelancer{interviewer_id:{id}}),(skill:Skill) where skill.name IN interviewer.skill_set foreach (skill_name IN interviewer.skills | foreach (k in (case when split(skill_name,'-')[0]=skill.name  then [1] else [] end) | merge (interviewer)-[:Has_experience {level:split(skill_name,'-')[1]}]->(skill))) return interviewer,skill","params":{"id":self.id.to_i}}
+    has_experience = {"query":"match (interviewer:Freelancer{interviewer_id:{id}}),(skill:Skill) where skill.name IN interviewer.skill_set foreach (skill_name IN interviewer.skills | foreach (k in (case when split(skill_name,'-')[0]=skill.name  then [1] else [] end) | merge (interviewer)-[:Has_experience {level:split(skill_name,'-')[1],is_certified:split(skill_name,'-')[2]}]->(skill))) return interviewer,skill","params":{"id":self.id.to_i}}
 
     understands = {"query":"match (interviewer:Freelancer{interviewer_id:{id}}),(language:Languages) where language.name IN interviewer.languages_set foreach (language_name IN interviewer.languages | foreach (k in (case when split(language_name,'-')[0]=language.name  then [1] else [] end) | merge (interviewer)-[:Understands {Proficiency:split(language_name,'-')[1]}]->(language))) return interviewer,language","params":{"id":self.id.to_i}}
 
@@ -185,11 +185,12 @@ puts "=========================="
 
     worked_as = {"query":"match (interviewer:Freelancer {interviewer_id:{id}}),(title:Title) where title.name = interviewer.title merge (interviewer)-[:Worked_As]->(title) return interviewer,title","params":{"id":self.id.to_i}}
 
-
+    result = {"query":"match (interviewer:Freelancer {interviewer_id:{id}}),(location:Location) where location.name = interviewer.location  return interviewer,location","params":{"id":self.id.to_i}}
+    puts "#{result}"
 
     has_location = {"query":"match (interviewer:Freelancer {interviewer_id:{id}}),(location:Location) where location.name = interviewer.location merge (interviewer)-[:Has_Location]->(location) return interviewer,location","params":{"id":self.id.to_i}}
 puts "#{has_location}"
-    relationship = [has_experience,understands,has_knowledge,worked_as,has_location]
+    relationship = [has_experience,understands,has_knowledge,worked_as,has_location,result]
 
     relationship
 
@@ -198,12 +199,22 @@ puts "#{has_location}"
 
 
   def self.import_data
-    CSV.foreach("new_interviewers.csv",:headers => true) do |row|
-      interviewer = Interviewer.new name:row[0],email:row[1],title:row[3],skills:row[4],languages_set:row[7],skill_set:row[5],languages:row[6],domain:row[2]
-      if interviewer.save
+    # CSV.foreach("new_interviewers.csv",:headers => true) do |row|
+    #   interviewer = Interviewer.new name:row[0],email:row[1],title:row[3],skills:row[4],languages_set:row[7],skill_set:row[5],languages:row[6],domain:row[2],location:"India",total_yrs_of_exp:5
+    #   if interviewer.save
+    #     puts "#{interviewer}"
+    #   end
+    # end
+    CSV.foreach("graph-interviewers.csv",:headers => true) do |row|
+      # puts "#{row[0]} ================#{row[8]}"
+      unless ["harnadha@gmail.com","harinam007@yahoo.com","athiruml@gmail.com"].include? row[1]
+
+        interviewer=   Interviewer.create(name: row[0], email: row[1], skill_set:row[2] , title: row[3], languages:row[4], expertise: row[5], languages_set: row[6] , skills: row[7], domain: row[8], location: row[9], total_yrs_of_exp: row[10] )
         puts "#{interviewer}"
       end
     end
+
+
 
   end
 
