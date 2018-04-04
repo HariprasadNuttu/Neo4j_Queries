@@ -33,6 +33,7 @@ module Neo4jModule
         end
 
         def Neo4jModule.destroy_node(params)
+          puts params
             response = RestClient.post "#{Neo4jModule::URL}", {"query":params[:query],"params":params[:params]}.to_json, :content_type =>"application/json";
             puts "#{response}"
             response
