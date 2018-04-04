@@ -12,7 +12,7 @@ module Neo4jModule
         def Neo4jModule.post(params)
             puts "#{params}"
             response = RestClient.post "#{Neo4jModule::URL}", {"query":params[:query],"params":params[:params]}.to_json, :content_type =>"application/json";
-            puts "============Response#{response}"
+            # puts "============Response#{response}"
             response
         end
 
@@ -24,7 +24,7 @@ module Neo4jModule
                 relationship_array.each do |params|
                     response = RestClient.post "#{Neo4jModule::URL}", {"query":params[:query],"params":params[:params]}.to_json, :content_type =>"application/json";
                     puts "#{params}"
-                    puts "#{response}"
+                    # puts "#{response}"
                 end
         end
         def Neo4jModule.update_node(params)

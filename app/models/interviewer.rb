@@ -181,7 +181,7 @@ puts "=========================="
   end
 
   def interviewer_profile
-    interviewer_data={"name":self.name,"email":self.email,title:self.title,skills:self.skills.split(/, |,/) ,languages:self.languages.split(/, |,/) , interviewer_id:self.id.to_i,skill_set:self.skill_set.split(/, |,/), languages_set:self.languages_set.split(/, |,/),domain: domain ? self.domain.split(/, |,/) : nil, location:self.location,total_yrs_of_exp:self.total_yrs_of_exp.to_i,expertise:self.expertise ? self.expertise : nil}
+    interviewer_data={"name":self.name,"email":self.email,title:self.title,skills:self.skills.split(/, |,/) ,languages:self.languages.split(/, |,/) , interviewer_id:self.id.to_i,skill_set:self.skill_set.split(/, |,/), languages_set:self.languages_set.split(/, |,/),domain: domain ? self.domain.split(/, |,/) : nil, location:self.location,total_yrs_of_exp:self.total_yrs_of_exp.to_i,expertise:self.expertise ? self.expertise.split(/, |,/) : nil}
     # location,total_yrs_of_exp
     interviewer_data
 
@@ -189,7 +189,7 @@ puts "=========================="
 
   def build_relationship
 
-    has_experience = {"query":"match (interviewer:Interviewer{interviewer_id:{id}}),(skill:Skill) where skill.name IN interviewer.skill_set foreach (skill_name IN interviewer.skills | foreach (k in (case when split(skill_name,'-')[0]=skill.name  then [1] else [] end) | merge (interviewer)-[:Has_experience {level:split(skill_name,'-')[1],is_certified:split(skill_name,'-')[2]}]->(skill))) return interviewer,skill","params":{"id":self.id.to_i}}
+    has_experience = {"query":"match (interviewer:Interviewer{interviewer_id:{id}}),(skill:Skill) where skill.name IN interviewer.skill_set foreach (skill_name IN interviewer.skills | foreach (k in (case when toLower(split(skill_name,'-')[0])=toLower(skill.name)  then [1] else [] end) | merge (interviewer)-[:Has_experience {level:split(skill_name,'-')[1],is_certified:split(skill_name,'-')[2]}]->(skill))) return interviewer,skill","params":{"id":self.id.to_i}}
 
     understands = {"query":"match (interviewer:Interviewer{interviewer_id:{id}}),(language:Languages) where language.name IN interviewer.languages_set foreach (language_name IN interviewer.languages | foreach (k in (case when split(language_name,'-')[0]=language.name  then [1] else [] end) | merge (interviewer)-[:Understands {Proficiency:split(language_name,'-')[1]}]->(language))) return interviewer,language","params":{"id":self.id.to_i}}
 
