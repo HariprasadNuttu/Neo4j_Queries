@@ -5,42 +5,69 @@ $neo4j_urls = $neo4j_urls[Rails.env]
 module Neo4jModule
     URL = "#{$neo4j_urls['url']}/db/data/cypher"
     def Neo4jModule.get(params)
-            response = RestClient.get "#{Neo4jModule::URL}", {"query":params[:query],"params":params[:params]}.to_json, :content_type =>"application/json";
+            begin
+            response = RestClient.get "#{Neo4jModule::URL}", {"query":params[:query],"params":params[:params]}.to_json, {:Authorization=>"#{$neo4j_urls['password']}",:content_type =>"application/json"};
+            rescue => e
+              puts "#{e.response}"
+            end
             response
         end
 
         def Neo4jModule.post(params)
             puts "#{params}"
-            response = RestClient.post "#{Neo4jModule::URL}", {"query":params[:query],"params":params[:params]}.to_json, :content_type =>"application/json";
+            begin
+            response = RestClient.post "#{Neo4jModule::URL}", {"query":params[:query],"params":params[:params]}.to_json, {:Authorization=>"#{$neo4j_urls['password']}",:content_type =>"application/json"};
+          rescue => e
+            puts "#{e.response}"
+          end
             # puts "============Response#{response}"
             response
         end
 
         def Neo4jModule.build_node(params)
-            response = RestClient.post "#{Neo4jModule::URL}", {"query":params[:query],"params":params[:params]}.to_json, :content_type =>"application/json";
+            begin
+            response = RestClient.post "#{Neo4jModule::URL}", {"query":params[:query],"params":params[:params]}.to_json, {:Authorization=>"#{$neo4j_urls['password']}",:content_type =>"application/json"};
+          rescue => e
+            puts "#{e.response}"
+          end
             response
         end
         def Neo4jModule.build_relationship(relationship_array)
                 relationship_array.each do |params|
-                    response = RestClient.post "#{Neo4jModule::URL}", {"query":params[:query],"params":params[:params]}.to_json, :content_type =>"application/json";
+                  begin
+                    response = RestClient.post "#{Neo4jModule::URL}", {"query":params[:query],"params":params[:params]}.to_json, {:Authorization=>"#{$neo4j_urls['password']}",:content_type =>"application/json"};
                     puts "#{params}"
+                  rescue => e
+                    puts "#{e.response}"
+                  end
                     # puts "#{response}"
                 end
         end
         def Neo4jModule.update_node(params)
-            response = RestClient.post "#{Neo4jModule::URL}", {"query":params[:query],"params":params[:params]}.to_json, :content_type =>"application/json";
+          begin
+            response = RestClient.post "#{Neo4jModule::URL}", {"query":params[:query],"params":params[:params]}.to_json, {:Authorization=>"#{$neo4j_urls['password']}",:content_type =>"application/json"};
+          rescue => e
+            puts "#{e.response}"
+          end
             response
         end
 
         def Neo4jModule.destroy_node(params)
-          puts params
-            response = RestClient.post "#{Neo4jModule::URL}", {"query":params[:query],"params":params[:params]}.to_json, :content_type =>"application/json";
-            puts "#{response}"
+          begin
+
+            response = RestClient.post "#{Neo4jModule::URL}", {"query":params[:query],"params":params[:params]}.to_json, {:Authorization=>"#{$neo4j_urls['password']}",:content_type =>"application/json"};
+          rescue => e
+            puts "#{e.response}"
+          end
             response
         end
 
         def Neo4jModule.destory_previous_relations(params)
-            response = RestClient.post "#{Neo4jModule::URL}", {"query":params[:query],"params":params[:params]}.to_json, :content_type =>"application/json";
+          begin
+            response = RestClient.post "#{Neo4jModule::URL}", {"query":params[:query],"params":params[:params]}.to_json, {:Authorization=>"#{$neo4j_urls['password']}",:content_type =>"application/json"};
+          rescue => e
+            puts "#{e.response}"
+          end
             response
         end
 
