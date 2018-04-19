@@ -1,12 +1,19 @@
 development:
   url: http://172.16.19.45:7474
-  password: "Basic bmVvNGo6c2VjcmV0"
+  password: "Basic bmVvNGo6cEBzc3cwcmQ="
 
 
 
 
-# username {neo4j: "bmVvNGo6c2VjcmV0"}
+# username {neo4j:secret - "bmVvNGo6c2VjcmV0"}
 #
+#
+# =begin
+#   # ZXRla2ktZGV2ZWxvcGVtZW50OnBAc3N3MHJk
+#   eteki-developement:p@ssw0rd
+# =end
+
+
 # Interviewer.create("title"=>"java", "resume"=>"Hariprasad Nuttu", "audio_bio"=>"hariprasadnuttu@mailinator.com","video_bio"=>"Accommodation,Administrative and Support Services", "highest_degree"=>"English-Fluent,Mandarin-Native", "skillset"=>"Oracle Adaptive Access Manager-Competent,CSS-Proficient")
 
 
